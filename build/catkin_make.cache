@@ -1,0 +1,2 @@
+eurobot
+-DCATKIN_DEVEL_PREFIX=/home/ubuntu/eurobot_ws/devel -DCMAKE_INSTALL_PREFIX=/home/ubuntu/eurobot_ws/install -G Unix Makefiles
