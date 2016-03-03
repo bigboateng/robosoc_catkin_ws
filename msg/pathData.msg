@@ -1,2 +1,2 @@
 string function # for example turnLeft
-int value # 20 deg
+int16 value # 20 deg
