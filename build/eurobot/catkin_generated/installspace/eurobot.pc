@@ -3,6 +3,6 @@ prefix=/home/ubuntu/eurobot_ws/install
 Name: eurobot
 Description: Description of eurobot
 Version: 0.0.0
-Cflags: 
+Cflags: -I/home/ubuntu/eurobot_ws/install/include
 Libs: -L/home/ubuntu/eurobot_ws/install/lib 
-Requires: 
+Requires: message_runtime

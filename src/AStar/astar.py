@@ -136,9 +136,6 @@ def make_walls(gridString, graph, nodes, width, height):
                     if (nodes[x+i][y+j] in graph):
                         if (nodes[x][y] in graph[nodes[x+i][y+j]]):
                             graph[nodes[x+i][y+j]].remove(nodes[x][y])
-                    #[nodes[x+i][y+j]]
-                    #del graph[nodes[x+i][y+j]][nodes[x][y]]                            
-                #print("Deleted (",str(x),",",y,")")
         y=y+1
 
 
