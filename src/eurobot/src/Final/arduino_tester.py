@@ -21,10 +21,10 @@ def actionComplete():
 def doAction():
     global action
     global value
-    if action == "t":
-        print("Turning robot by: {} degrees".format(value))
-    elif action == "d":
-        print("Driving robot by {} cm".format(value))
+    if action == "turn":
+        print("Turning robot by: %.2f degrees" %value)
+    elif action == "drive":
+        print("Driving robot by %.2f cm" %value)
     elif action == "action":
         print("Doing Action: {}".format(value))
     actionComplete()

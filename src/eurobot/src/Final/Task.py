@@ -1,5 +1,5 @@
 #!usr/bin/env python
-##from astar import *
+from astar import PathPlanner
 class Task:
     def __init__(self, coordinates, actions):
         """
@@ -8,8 +8,6 @@ class Task:
         """
         self.actions = actions
         self.coordinates = coordinates
-        self.fakePaths = [('t', 1.89), ('d', 36.4),
-                          ('t', 0.79), ('d', 7.07), ('t', 0.0)]
 
   
     def generatePath(self, currentPos):
@@ -20,11 +18,22 @@ class Task:
         # loop through all actions and generate path
         paths = []
         actions = self.actions
-        coordinates = self.coordinates  
+        coordinates = self.coordinates
+        planner = PathPlanner()
+        lastPosition = (None, None)
         for i in range(len(self.actions)):
             """Tipically it would be """
 ##            planner = PathPlanner()
 ##            path = planer.getPath(currentPos,coordinates[i],10,12)
-            paths.extend(self.fakePaths)
-            paths.append(('action',actions[i]))
+            if i == 0:
+##                print("Starting at {}".format(currentPos))
+                paths.extend(planner.getPath(currentPos, coordinates[i],10,12))
+                paths.append(('action',actions[i]))
+                lastPosition = coordinates[0]
+            else:
+##                print("Starting at {}".format(lastPosition))
+                paths.extend(planner.getPath(lastPosition, coordinates[i],10,12))
+                paths.append(('action',actions[i]))
+                lastPosition = coordinates[i]
+            
         return paths

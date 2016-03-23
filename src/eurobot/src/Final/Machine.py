@@ -2,6 +2,7 @@
 import rospy
 from std_msgs.msg import String, Int16
 from Task import Task
+from Timer import Timer
 
 ##store the different Functions as list
 tasks = []
@@ -11,7 +12,9 @@ currentTaskActions = []
 currentPos = (15,20)
 ##robot position variables
 robotPos = (0,0)
-
+##store time elapsed
+timeCount = Timer()
+timeLimit = 89.00
 def onRobotPosition(robotPosition):
     global robotPos
     positionToInt = robotPosition.msg.split(',')
@@ -30,6 +33,7 @@ def onArduinoMessage(message):
     elif msg == "obstacleDetected":
         """ deal with this TODO"""
     elif msg == "start":
+        timeCount.restart()
         """start python timer TODO"""
         runMainLoop()
     
@@ -37,21 +41,25 @@ def runMainLoop():
     """TODO: insert proper comment"""
     global currentTaskActions
     global tasks
-    if len(tasks) > 0:
-        if len(currentTaskActions) > 0:
-            """ perform the actions actions"""
-            print("There are %d actions left for arduino" %len(currentTaskActions))
-            print("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
-            actionNamePublisher.publish(currentTaskActions[0][0])
-            actionValuePublisher.publish(currentTaskActions[0][1])
-        else:
-            """get new actions if there are any actions left"""
-            del tasks[0]
-            if len(tasks) > 0:
-                currentTaskActions = tasks[0].generatePath(robotPos)
-                runMainLoop()
+    if timeCount < timeLimit:
+        if len(tasks) > 0:
+            if len(currentTaskActions) > 0:
+                """ perform the actions actions"""
+                print("There are %d actions left for arduino" %len(currentTaskActions))
+                print("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
+                actionNamePublisher.publish(currentTaskActions[0][0])
+                actionValuePublisher.publish(currentTaskActions[0][1])
             else:
-                print("All Actions Complete")
+                """get new actions if there are any actions left"""
+                del tasks[0]
+                if len(tasks) > 0:
+                    currentTaskActions = tasks[0].generatePath(robotPos)
+                    runMainLoop()
+                else:
+                    print("Time elapsed: {} secs".format(timeCount.get_time_secs()))
+                    print("All Actions Complete")
+        else:
+            print("Time limit reached, no more commands can be sent")
 
 
 rospy.init_node('pythonNode',anonymous=True)
