@@ -7,13 +7,23 @@ from std_msgs.msg import Int16, String
 action = None
 value = None
 
+def printCommands():
+    """Print all available commands"""
+    print("start \t To start communication")
+    print("y \t to send message received command")
+    print("help \t to show the available commands\n\n")
+    a = raw_input("Press Enter key to exit")
+    actionComplete()
+
 def actionComplete():
     global arduinoMessagePublisher
-    a = raw_input("Enter y to continue\n")
+    a = raw_input("Enter an action to continue \t Type 'help' for help\n->")
     if a == "y":
         arduinoMessagePublisher.publish('actionComplete')
     elif a == "start":
         arduinoMessagePublisher.publish("start")
+    elif a == "help":
+        printCommands()
     else:
         print("Command not found, try again! \n")
         actionComplete()

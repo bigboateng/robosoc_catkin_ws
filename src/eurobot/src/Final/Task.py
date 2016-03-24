@@ -1,11 +1,12 @@
 #!usr/bin/env python
 from astar import PathPlanner
 class Task:
-    def __init__(self, coordinates, actions):
+    def __init__(self,name, coordinates, actions):
         """
         coordinates = [(),(),(),()]
         actions = ['pickUp', 'closeDoors', 'doNothing']
         """
+        self.name = name
         self.actions = actions
         self.coordinates = coordinates
 
@@ -37,3 +38,6 @@ class Task:
                 lastPosition = coordinates[i]
             
         return paths
+
+    def get_name(self):
+        return self.name

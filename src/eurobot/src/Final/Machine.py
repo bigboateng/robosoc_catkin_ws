@@ -15,6 +15,28 @@ robotPos = (0,0)
 ##store time elapsed
 timeCount = Timer()
 timeLimit = 89.00
+##store the coordinates of the stars
+starsCoords = []
+
+
+def stringToTuple(string):
+    """convertts input coordinates to valid tuple"""
+    string = string.split(",")
+    return tuple((int(string[0]), int(string[1])))
+
+    
+def AskForStarsPosition():
+    """This will take in the coordinates of the starts position"""
+    global startsCoords
+    a = raw_input("Enter coordinates \t type 'end' when finished'\n->")
+    if a == "end":
+        print("stars coords are: {}".format(starsCoords))
+        pass
+    else:
+        starsCoords.append(stringToTuple(a))
+        AskForStarsPosition()
+
+
 def onRobotPosition(robotPosition):
     global robotPos
     positionToInt = robotPosition.msg.split(',')
@@ -39,13 +61,13 @@ def onArduinoMessage(message):
     
 def runMainLoop():
     """TODO: insert proper comment"""
-    global currentTaskActions
-    global tasks
-    if timeCount < timeLimit:
+    global currentTaskActions, tasks
+    global timeCount, timeLimit
+    if timeCount.get_time_secs() < timeLimit:
         if len(tasks) > 0:
             if len(currentTaskActions) > 0:
                 """ perform the actions actions"""
-                print("There are %d actions left for arduino" %len(currentTaskActions))
+                print("{} actions left, time elapsed: {}".format(len(currentTaskActions), timeCount.get_time_secs()))
                 print("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
                 actionNamePublisher.publish(currentTaskActions[0][0])
                 actionValuePublisher.publish(currentTaskActions[0][1])
@@ -71,10 +93,17 @@ robotPositionSubscriber = rospy.Subscriber('robotPosition',String, onRobotPositi
 
 if __name__  == "__main__":
     currentTaskActions = []
-    closeDoor = Task([(45,20), (33,33)],[1, 2])
-    pickUpStar1 = Task([(33,22),(34,33)], [33, 4])
+    closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
     tasks.append(closeDoor)
-    tasks.append(pickUpStar1)
     currentTaskActions = closeDoor.generatePath(currentPos)
-##    runMainLoop()
+    AskForStarsPosition()
+    if len(starsCoords) > 0:
+        for coord in starsCoords:
+            starTask = Task('pick up star {}'.format(starsCoords.index(coord)),[coord],[4])
+            tasks.append(starTask)
+    print("******************************")
+    print("TASK ID \t NAME")
+    for t in tasks:
+        print(str(tasks.index(t)) + "\t" + t.get_name())
+    print("****Listening for START command from arduino****")
     rospy.spin()
