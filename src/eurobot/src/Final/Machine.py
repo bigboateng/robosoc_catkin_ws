@@ -11,30 +11,32 @@ currentTaskActions = []
 ##fake current position TODO: remove this
 currentPos = (15,20)
 ##robot position variables
-robotPos = (0,0)
+robotPos = (3,16)
 ##store time elapsed
 timeCount = Timer()
 timeLimit = 89.00
 ##store the coordinates of the stars
-starsCoords = []
-
-
-def stringToTuple(string):
-    """convertts input coordinates to valid tuple"""
-    string = string.split(",")
-    return tuple((int(string[0]), int(string[1])))
-
+shellCoords = []
+##different configuration for shells
+shellConfig1 = [(7,26),(30,26),(26,27),(36,27),(48,30)]
+shellConfig2 = [(7,26),(30,26),(26,27),(48,30),(56,30)]
+shellConfig3 = [(18,28),(26,27),(30,30),(30,36),(48,30)]
+shellConfig4 = [(18,28),(30,30),(30,36),(36,27),(56,30),(56,26)]
+shellConfigArray = [shellConfig1, shellConfig2, shellConfig3, shellConfig4]
     
-def AskForStarsPosition():
+def AskForShellConfiguration():
     """This will take in the coordinates of the starts position"""
-    global startsCoords
-    a = raw_input("Enter coordinates \t type 'end' when finished'\n->")
-    if a == "end":
-        print("stars coords are: {}".format(starsCoords))
-        pass
-    else:
-        starsCoords.append(stringToTuple(a))
-        AskForStarsPosition()
+    try:
+        a = int(raw_input("Enter shell config number \n ->"))
+        if 0 < a < 4:
+            print("Shell configuration == {}".format(shellConfigArray[a]))
+            shellCoords.extend(shellConfigArray[a])
+        else:
+            print("Configuration {} does not exist".format(a))
+            AskForShellConfiguration()
+    except ValueError:
+        print("Please enter a nuumber")
+        AskForShellConfiguration()
 
 
 def onRobotPosition(robotPosition):
@@ -67,7 +69,7 @@ def runMainLoop():
         if len(tasks) > 0:
             if len(currentTaskActions) > 0:
                 """ perform the actions actions"""
-                print("{} actions left, time elapsed: {}".format(len(currentTaskActions), timeCount.get_time_secs()))
+                print("{} actions left\t Current job: {} \ttime elapsed: {}".format(len(currentTaskActions),tasks[0].get_name(), timeCount.get_time_secs()))
                 print("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
                 actionNamePublisher.publish(currentTaskActions[0][0])
                 actionValuePublisher.publish(currentTaskActions[0][1])
@@ -93,14 +95,17 @@ robotPositionSubscriber = rospy.Subscriber('robotPosition',String, onRobotPositi
 
 if __name__  == "__main__":
     currentTaskActions = []
+##    move blocks at start: Coors are now real
+    moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
+    tasks.append(moveBlocks)
+    currentTaskActions = moveBlocks.generatePath(robotPos)
+##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
     tasks.append(closeDoor)
-    currentTaskActions = closeDoor.generatePath(currentPos)
-    AskForStarsPosition()
-    if len(starsCoords) > 0:
-        for coord in starsCoords:
-            starTask = Task('pick up star {}'.format(starsCoords.index(coord)),[coord],[4])
-            tasks.append(starTask)
+    AskForShellConfiguration()
+    for coord in shellCoords:
+        shellTask = Task('pick up shell {}'.format(shellCoords.index(coord)),[coord],[4])
+        tasks.append(shellTask)
     print("******************************")
     print("TASK ID \t NAME")
     for t in tasks:
