@@ -7,11 +7,26 @@ from std_msgs.msg import Int16, String
 action = None
 value = None
 
+def startProgram():
+    """This initializes the program"""
+    try:
+        print("Program has started...\n")
+        a = int(input("Enter shell config number\n->"))
+    except ValueError:
+        print("Please enter a number between 1 and 4")
+    finally:
+        if 0 < a < 4:
+            shellConfigNumPublisher.publish(a)
+##            arduinoMessagePublisher.publish("start")
+        else:
+            print("Number needs to be between 1 and 4!")
+            startProgram()
+
 def printCommands():
     """Print all available commands"""
-    print("start \t To start communication")
     print("y \t to send message received command")
     print("help \t to show the available commands\n\n")
+    print("reset /t to reset the python program")
     a = raw_input("Press Enter key to exit")
     actionComplete()
 
@@ -20,13 +35,19 @@ def actionComplete():
     a = raw_input("Enter an action to continue \t Type 'help' for help\n->")
     if a == "y":
         arduinoMessagePublisher.publish('actionComplete')
-    elif a == "start":
-        arduinoMessagePublisher.publish("start")
     elif a == "help":
         printCommands()
+    elif a == "reset":
+        startProgram()
+    elif a == "start":
+        arduinoMessagePublisher.publish('start')
+    elif a == "e":
+        print("Exiting...")
+        exit()
     else:
         print("Command not found, try again! \n")
         actionComplete()
+        
 
 def doAction():
     global action
@@ -50,13 +71,13 @@ def actionNameReceived(message):
 
 ## init rospy and nodes
 rospy.init_node('ArduinoProgram', anonymous=True)
+shellConfigNumPublisher = rospy.Publisher('shellConfigNum', Int16, queue_size=10)
 arduinoMessagePublisher = rospy.Publisher('arduinoMessage', String, queue_size=10)
 actionValueSubscriber = rospy.Subscriber('actionValue', Int16, actionValueReceived)
 actionNameSubscriber = rospy.Subscriber('actionName', String, actionNameReceived)
-    
 
 
 if __name__ == "__main__":
-    actionComplete()
+    startProgram()
     rospy.spin()
     

@@ -3,11 +3,13 @@ import rospy
 from std_msgs.msg import String, Int16
 from Task import Task
 from Timer import Timer
-
+from astar import PathPlanner
+##astar planner object
+pathPlanner = PathPlanner()
 ##store the different Functions as list
-tasks = []
+##tasks = []
 ##store the actions for current Task as list
-currentTaskActions = []
+##currentTaskActions = []
 ##fake current position TODO: remove this
 currentPos = (15,20)
 ##robot position variables
@@ -23,23 +25,23 @@ shellConfig2 = [(7,26),(30,26),(26,27),(48,30),(56,30)]
 shellConfig3 = [(18,28),(26,27),(30,30),(30,36),(48,30)]
 shellConfig4 = [(18,28),(30,30),(30,36),(36,27),(56,30),(56,26)]
 shellConfigArray = [shellConfig1, shellConfig2, shellConfig3, shellConfig4]
+
+## TODO: Scheduling Algorithm, Object Avoidance, Logging Data, More Testing
+
+
+def onShellNumberReceived(msg):
+    """
+    param msg: which shell configuration to use
+    """
+    global shellCoords
+    shellCoords = shellConfigArray[msg.data]
+    print("Shell coords: {}".format(shellCoords))
+    resetProgram()
+    timeCount.restart()
+    runMainLoop()
     
-def AskForShellConfiguration():
-    """This will take in the coordinates of the starts position"""
-    try:
-        a = int(raw_input("Enter shell config number \n ->"))
-        if 0 < a < 4:
-            print("Shell configuration == {}".format(shellConfigArray[a]))
-            shellCoords.extend(shellConfigArray[a])
-        else:
-            print("Configuration {} does not exist".format(a))
-            AskForShellConfiguration()
-    except ValueError:
-        print("Please enter a nuumber")
-        AskForShellConfiguration()
-
-
 def onRobotPosition(robotPosition):
+    """THis updates the robot's position. TODO"""
     global robotPos
     positionToInt = robotPosition.msg.split(',')
     robotPos[0] = int(positionToInt[0])
@@ -47,11 +49,13 @@ def onRobotPosition(robotPosition):
                     
 def onArduinoMessage(message):
     """
-    arduino calls this function whenever it finishes performing an action
+    param message: messages sent from arduino to perform certain actions
+    returns      : None
     """
     msg = message.data
     if msg == "actionComplete":        
         ## action complete, delete it and run next one
+        global currentTaskActions
         del currentTaskActions[0]
         runMainLoop()
     elif msg == "obstacleDetected":
@@ -60,6 +64,10 @@ def onArduinoMessage(message):
         timeCount.restart()
         """start python timer TODO"""
         runMainLoop()
+    elif msg == "reset":
+        currentTaskActions = []
+        tasks = []
+        resetProgram()
     
 def runMainLoop():
     """TODO: insert proper comment"""
@@ -77,32 +85,29 @@ def runMainLoop():
                 """get new actions if there are any actions left"""
                 del tasks[0]
                 if len(tasks) > 0:
-                    currentTaskActions = tasks[0].generatePath(robotPos)
+                    currentTaskActions = tasks[0].generatePath(pathPlanner, robotPos)
+##                  TODO: remove the line below
+                    print(tasks[0].generatePath(pathPlanner, robotPos))
                     runMainLoop()
                 else:
                     print("Time elapsed: {} secs".format(timeCount.get_time_secs()))
                     print("All Actions Complete")
-        else:
-            print("Time limit reached, no more commands can be sent")
+    else:
+        print("Time limit reached, no more commands can be sent")
 
-
-rospy.init_node('pythonNode',anonymous=True)
-actionNamePublisher = rospy.Publisher('actionName', String, queue_size=10)
-actionValuePublisher = rospy.Publisher('actionValue', Int16, queue_size=10)
-arduinoMessageSubscriber = rospy.Subscriber('arduinoMessage', String, onArduinoMessage)
-robotPositionSubscriber = rospy.Subscriber('robotPosition',String, onRobotPosition)
-   
-
-if __name__  == "__main__":
+def resetProgram():
+    """This will reset the program"""
+    global currentTaskActions, tasks, shellCoords
     currentTaskActions = []
-##    move blocks at start: Coors are now real
+    tasks = []
+    ##    move blocks at start: Coors are now real
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
     tasks.append(moveBlocks)
-    currentTaskActions = moveBlocks.generatePath(robotPos)
+    currentTaskActions = moveBlocks.generatePath(pathPlanner, robotPos)
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
     tasks.append(closeDoor)
-    AskForShellConfiguration()
+##   adding shells  
     for coord in shellCoords:
         shellTask = Task('pick up shell {}'.format(shellCoords.index(coord)),[coord],[4])
         tasks.append(shellTask)
@@ -111,4 +116,17 @@ if __name__  == "__main__":
     for t in tasks:
         print(str(tasks.index(t)) + "\t" + t.get_name())
     print("****Listening for START command from arduino****")
+
+rospy.init_node('pythonNode',anonymous=True)
+actionNamePublisher = rospy.Publisher('actionName', String, queue_size=10)
+actionValuePublisher = rospy.Publisher('actionValue', Int16, queue_size=10)
+arduinoMessageSubscriber = rospy.Subscriber('arduinoMessage', String, onArduinoMessage)
+robotPositionSubscriber = rospy.Subscriber('robotPosition',String, onRobotPosition)
+shellConfigNumber = rospy.Subscriber("shellConfigNum", Int16, onShellNumberReceived)
+
+if __name__  == "__main__":
+    """This will reset the program"""
+    currentTaskActions = []
+    tasks = []
+    print("Waiting for commands from arduino")
     rospy.spin()

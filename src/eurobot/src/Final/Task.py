@@ -1,5 +1,4 @@
 #!usr/bin/env python
-from astar import PathPlanner
 class Task:
     def __init__(self,name, coordinates, actions):
         """
@@ -11,7 +10,7 @@ class Task:
         self.coordinates = coordinates
 
   
-    def generatePath(self, currentPos):
+    def generatePath(self, planner, currentPos):
         """
         param currentPosition: tuple of currentPosition (x,y)
         returns: generate all the paths, actions and put them in one list
@@ -20,7 +19,6 @@ class Task:
         paths = []
         actions = self.actions
         coordinates = self.coordinates
-        planner = PathPlanner()
         lastPosition = (None, None)
         for i in range(len(self.actions)):
             """Tipically it would be """
