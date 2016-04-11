@@ -56,6 +56,7 @@ def onArduinoMessage(message):
     msg = message.data
     if msg == "actionComplete":        
         ## action complete, delete it and run next one
+        rospy.loginfo("Arduino has replied")
         global currentTaskActions
         del currentTaskActions[0]
         runMainLoop()
@@ -129,7 +130,6 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    time.sleep(5)
     resetProgram()
     timeCount.restart()
     runMainLoop()
