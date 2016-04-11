@@ -130,6 +130,7 @@ if __name__  == "__main__":
     currentTaskActions = []
     tasks = []
     time.sleep(5)
+    resetProgram()
     timeCount.restart()
     runMainLoop()
     rospy.loginfo("Sent commands");
