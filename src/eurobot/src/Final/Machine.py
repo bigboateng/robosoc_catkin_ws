@@ -129,9 +129,9 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    time.sleep(5)
+    """time.sleep(5)
     resetProgram()
     timeCount.restart()
     runMainLoop()
-    rospy.loginfo("Sent commands");
+    rospy.loginfo("Sent commands");"""
     rospy.spin()
