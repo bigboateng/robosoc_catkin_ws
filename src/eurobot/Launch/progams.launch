@@ -4,7 +4,7 @@
     <param name="baud" value="57600"/>
   </node>
 
-<node pkg="eurobot" type="led_toggle.py" name="led_toggle"/>
+<node pkg="eurobot" type="Machine.py" name="Machine"/>
 </launch>
 
 
