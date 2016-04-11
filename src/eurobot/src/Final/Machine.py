@@ -4,6 +4,7 @@ from std_msgs.msg import String, Int16
 from Task import Task
 from Timer import Timer
 from astar import PathPlanner
+import time
 ##astar planner object
 pathPlanner = PathPlanner()
 ##store the different Functions as list
@@ -128,6 +129,7 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
+    time.sleep(5)
     timeCount.restart()
     runMainLoop()
     rospy.loginfo("Sent commands");
