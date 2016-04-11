@@ -16,7 +16,7 @@ currentPos = (15,20)
 robotPos = (3,16)
 ##store time elapsed
 timeCount = Timer()
-timeLimit = 89.00
+timeLimit = 890.00
 ##store the coordinates of the stars
 shellCoords = []
 ##different configuration for shells
@@ -128,5 +128,7 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    print("Waiting for commands from arduino")
+    timeCount.restart()
+    runMainLoop()
+    print("Sent commands");
     rospy.spin()
