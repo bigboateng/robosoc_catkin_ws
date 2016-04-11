@@ -62,15 +62,27 @@ class AStarGridNode(AStarNode):
 
     def move_cost(self, other):
         diagonal = abs(self.x - other.x) == 1 and abs(self.y - other.y) == 1
-        return 14 if diagonal else 10 # fourteen comes from 1.414 = sqrt(2) for diagonals
+        return 140 if diagonal else 10 # fourteen comes from 1.414 = sqrt(2) for diagonals
 
 class PathPlanner(object):
     
     def __init__(self):
-        self.gridString="""000000000000000010000000000001100000000000010000000000000000
-000000000000000010000000000001100000000000010000000000000000
-000000000000000010000000000001100000000000010000000000000000
-000000000000000010000000000001100000000000010000000000000000
+        self.gridString="""000000000000000010000000000000000000000000010000000000000000
+000000000000000010000000000000000000000000010000000000000000
+000000000000000010000000000000000000000000010000000000000000
+000000000000000010000000000000000000000000010000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000111111111111111111111111000000000000000000
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
@@ -79,34 +91,22 @@ class PathPlanner(object):
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
-000000000000000000000000000111111000000000000000000000000000
-000000000000000000000000000111111000000000000000000000000000
-000000000000000000000000000111111000000000000000000000000000
-000000000000000001111111111111111111111111000000000000000000
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
 000000000000000000000000000001100000000000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000001100000100000000000000000000000
-000000000000000000000010000000000000100000000000000000000000
-000000000000000000000010000000000000100000000000000000000000
-000000000000000000000010000000000000100000000000000000000000
-000000000000000000000011111111111111100000000000000000000000
-000000000000000000000000000001000000000000000000000000000000
-000000000000000000000000000001000000000000000000000000000000
-000000000000000000000000000001000000000000000000000000000000
-000000000000000000000000000001000000000000000000000000000000
-111000000000000000000000000001000000000000000000000000000111
-111100000000000000000000000001000000000000000000000000001111
-111110000000000000000000000001000000000000000000000000011111
-111110000000000000000000000001000000000000000000000000011111
-111110000000000000000000000001000000000000000000000000011111"""
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000
+111000000000000000000000000000000000000000000000000000000111
+111100000000000000000000000000000000000000000000000000001111
+111110000000000000000000000000000000000000000000000000011111
+111110000000000000000000000000000000000000000000000000011111
+111110000000000000000000000000000000000000000000000000011111"""
         
     def make_graph(self,width, height):
         nodes = [[AStarGridNode(x, y) for y in range(height)] for x in range(width)]
@@ -115,7 +115,7 @@ class PathPlanner(object):
             node = nodes[x][y]
             graph[node] = []
             # neighbours
-            for i, j in product([-1, 0, 1], [-1, 0, 1]): #returns pairs such as 00 01 10 11 0-1 -10 -11 1-1
+            for i, j in product([-2, -1, 0, 1, 2], [-2, -1, 0, 1, 2]): #returns pairs such as 00 01 10 11 0-1 -10 -11 1-1
                 if not (0 <= x + i < width):
                     continue
                 if not (0 <= y + j < height):
@@ -172,10 +172,48 @@ class PathPlanner(object):
             if node.obst:
                 if (node1 is not node) or (node2 is not node):
                     dist = self.distance(node1,node2,node)
-                    if dist < 0.7:
-                        #print(node.x, '\t', node.y)
+                    if dist < 0.8:
                         return True
         return False
+
+    def add_obsticle(self, coords, direction):
+        width = 1 #squares in both direction
+        length = 2 #squares in one direction
+        boxlist = product([0], [0])
+        if (direction<23) and (direction>=338):
+            boxlist=product([0,1], [-1,0,1])
+        elif (direction<68) and (direction>=23):
+            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,0),(0,1),(0,2),(1,1)]
+        elif (direction<103) and (direction>=68):
+            boxlist=product([-1,0,1],[0,1])
+        elif (direction<158) and (direction>=113):
+            boxlist=[(-1,1),(0,2),(0,1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
+        elif (direction<203) and (direction>=158):
+            boxlist=product([0,-1], [-1,0,1])
+        elif (direction<248) and (direction>=203):
+            boxlist=[(-1,-1),(0,-2),(0,-1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
+        elif (direction<293) and (direction>=248):
+            boxlist=product([-1,0,1],[0,-1])
+        elif (direction<338) and (direction>=293):
+            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,-2),(0,-1),(0,0),(1,-1)]
+        
+        for m, n in boxlist:
+            x = coords.x + m
+            y = coords.y + n
+            node=nodes[x][y]
+            node.obst=True
+            for i, j in product([-1, 0, 1], [-1, 0, 1]):
+                if not (0 <= x + i < width):
+                    continue
+                
+                if not (0 <= y + j < height):
+                    continue
+
+                if (nodes[x+i][y+j] in graph):
+                    if (node in graph[nodes[x+i][y+j]]):
+                        graph[nodes[x+i][y+j]].remove(node)
+
+        
 
     def generalise(self,graph, nodes, path):
         newpath=[] #list of generalised points
@@ -192,7 +230,7 @@ class PathPlanner(object):
 
         if newpath[count] is not prevNode:
             newpath.append(prevNode)
-        #print ('New Path')
+        #print ('New Path')]
         return newpath
 
     def dist(self,node1, node2):
@@ -204,7 +242,7 @@ class PathPlanner(object):
         x1, y1 = node1.x, node1.y
         x2, y2 = node2.x, node2.y
         d_x = (x2 - x1) #delta x
-        d_y = (y2 - y1) #delta y
+        d_y = (y1 - y2) #delta y
         if d_y==0:
             d_y=0.0000000001
         if d_x>=0 and d_y>0:
@@ -215,6 +253,22 @@ class PathPlanner(object):
             return pi+atan(d_x/d_y)
         if d_x<=0 and d_y>0:
             return 2*pi-atan(-d_x/d_y)
+
+    #clockwise is positive
+    def calcAngle(self, prevBearing, newBearing):
+        angle=newBearing-prevBearing
+        
+        if (newBearing>270.0 and prevBearing<90.0):
+            angle = angle-360
+        elif (prevBearing>270.0 and newBearing<90.0):
+            angle = angle+360
+        elif (angle<-180):
+            angle=360+angle
+        elif (angle>180):
+            angle=360-angle
+
+        return angle
+        
 
     # gets nodes in a format: start, end = (15,20), (45,20)
     def getPath(self,start, end, startdirection, enddirection):
@@ -227,15 +281,19 @@ class PathPlanner(object):
         if path is None:
             instructions.append("NoPath")
         else:
-            currentDirection = startdirection # some direction relative to north
             newpath = self.generalise(graph, nodes, path)
             prevNode = newpath[0]
+            prevBearing = startdirection
             for node in newpath:
-                instruct = ("turn",360*self.bearing(prevNode,node)/(2*pi))
-                instructions.append(instruct)
-                instruct = ("drive",self.dist(prevNode,node)*5)
-                instructions.append(instruct)
+                if not node==newpath[0]:
+                    newBearing = 360*self.bearing(prevNode,node)/(2*pi);
+                    instruct = ("turn",round(self.calcAngle(prevBearing, newBearing),0))
+                    instructions.append(instruct)
+                    instruct = ("drive",round(self.dist(prevNode,node)*5,0))
+                    instructions.append(instruct)
+                    prevBearing = newBearing;
                 prevNode=node
-            instruct = ("turn",enddirection)
+                
+            instruct = ("turn",round(self.calcAngle(prevBearing, enddirection),0))
             instructions.append(instruct)
         return instructions
