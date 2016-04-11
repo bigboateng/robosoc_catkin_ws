@@ -35,7 +35,7 @@ def onShellNumberReceived(msg):
     """
     global shellCoords
     shellCoords = shellConfigArray[msg.data]
-    print("Shell coords: {}".format(shellCoords))
+    rospy.loginfo("Shell coords: {}".format(shellCoords))
     resetProgram()
     timeCount.restart()
     runMainLoop()
@@ -77,8 +77,8 @@ def runMainLoop():
         if len(tasks) > 0:
             if len(currentTaskActions) > 0:
                 """ perform the actions actions"""
-                print("{} actions left\t Current job: {} \ttime elapsed: {}".format(len(currentTaskActions),tasks[0].get_name(), timeCount.get_time_secs()))
-                print("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
+                rospy.loginfo("{} actions left\t Current job: {} \ttime elapsed: {}".format(len(currentTaskActions),tasks[0].get_name(), timeCount.get_time_secs()))
+                rospy.loginfo("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
                 actionNamePublisher.publish(currentTaskActions[0][0])
                 actionValuePublisher.publish(currentTaskActions[0][1])
             else:
@@ -87,13 +87,13 @@ def runMainLoop():
                 if len(tasks) > 0:
                     currentTaskActions = tasks[0].generatePath(pathPlanner, robotPos)
 ##                  TODO: remove the line below
-                    print(tasks[0].generatePath(pathPlanner, robotPos))
+                    rospy.loginfo(tasks[0].generatePath(pathPlanner, robotPos))
                     runMainLoop()
                 else:
-                    print("Time elapsed: {} secs".format(timeCount.get_time_secs()))
-                    print("All Actions Complete")
+                    rospy.loginfo("Time elapsed: {} secs".format(timeCount.get_time_secs()))
+                    rospy.loginfo("All Actions Complete")
     else:
-        print("Time limit reached, no more commands can be sent")
+        rospy.loginfo("Time limit reached, no more commands can be sent")
 
 def resetProgram():
     """This will reset the program"""
@@ -111,11 +111,11 @@ def resetProgram():
     for coord in shellCoords:
         shellTask = Task('pick up shell {}'.format(shellCoords.index(coord)),[coord],[4])
         tasks.append(shellTask)
-    print("******************************")
-    print("TASK ID \t NAME")
+    rospy.loginfo("******************************")
+    rospy.loginfo("TASK ID \t NAME")
     for t in tasks:
-        print(str(tasks.index(t)) + "\t" + t.get_name())
-    print("****Listening for START command from arduino****")
+        rospy.loginfo(str(tasks.index(t)) + "\t" + t.get_name())
+    rospy.loginfo("****Listening for START command from arduino****")
 
 rospy.init_node('pythonNode',anonymous=True)
 actionNamePublisher = rospy.Publisher('actionName', String, queue_size=10)
@@ -130,5 +130,5 @@ if __name__  == "__main__":
     tasks = []
     timeCount.restart()
     runMainLoop()
-    print("Sent commands");
+    rospy.loginfo("Sent commands");
     rospy.spin()
