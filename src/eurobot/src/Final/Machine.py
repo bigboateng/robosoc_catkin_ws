@@ -106,6 +106,7 @@ def resetProgram():
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
     tasks.append(moveBlocks)
     currentTaskActions = moveBlocks.generatePath(pathPlanner, robotPos)
+    rospy.loginfo(moveBlocks.generatePath(pathPlanner, robotPos))
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
     tasks.append(closeDoor)
