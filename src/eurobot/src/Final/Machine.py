@@ -130,6 +130,7 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
+    shellCoords = shellConfigArray[1]
     resetProgram()
     timeCount.restart()
     runMainLoop()
