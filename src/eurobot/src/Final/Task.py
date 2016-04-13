@@ -26,12 +26,12 @@ class Task:
 ##            path = planer.getPath(currentPos,coordinates[i],10,12)
             if i == 0:
 ##                print("Starting at {}".format(currentPos))
-                paths.extend(planner.getPath(currentPos, coordinates[i],10,12))
+                paths.extend(planner.getPath(currentPos, coordinates[i],0,0))
                 paths.append(('action',actions[i]))
                 lastPosition = coordinates[0]
             else:
 ##                print("Starting at {}".format(lastPosition))
-                paths.extend(planner.getPath(lastPosition, coordinates[i],10,12))
+                paths.extend(planner.getPath(lastPosition, coordinates[i],0,0))
                 paths.append(('action',actions[i]))
                 lastPosition = coordinates[i]
             
