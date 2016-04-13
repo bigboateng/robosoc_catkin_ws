@@ -54,7 +54,7 @@ def onArduinoMessage(message):
     returns      : None
     """
     msg = message.data
-    if msg == "actionComplete":        
+    if msg == "a":        
         ## action complete, delete it and run next one
         rospy.loginfo("Arduino has replied")
         global currentTaskActions
