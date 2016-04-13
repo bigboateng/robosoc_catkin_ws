@@ -63,8 +63,8 @@ def onArduinoMessage(message):
     elif msg == "obstacleDetected":
         """ deal with this TODO"""
     elif msg == "start":
+        resetProgram()
         timeCount.restart()
-        """start python timer TODO"""
         runMainLoop()
     elif msg == "reset":
         currentTaskActions = []
@@ -130,8 +130,5 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    resetProgram()
-    timeCount.restart()
-    runMainLoop()
-    rospy.loginfo("Sent commands")
+    rospy.loginfo("Waiting for start command")
     rospy.spin()
