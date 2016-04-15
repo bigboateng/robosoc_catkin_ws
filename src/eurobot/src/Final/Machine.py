@@ -131,8 +131,5 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    resetProgram()
-    timeCount.restart()
-    runMainLoop()
     rospy.loginfo("Waiting for start command")
     rospy.spin()
