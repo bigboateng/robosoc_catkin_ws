@@ -4,6 +4,7 @@ from math import sqrt, atan, pi
 class AStar(object):
     def __init__(self, graph):
         self.graph = graph
+        self.obstacles = []
         
     def heuristic(self, node, start, end):
         raise NotImplementedError
@@ -19,7 +20,9 @@ class AStar(object):
                 path = []
                 while current.parent:
                     path.append(current)
-                    current = current.parent
+                    parent = current.parent
+                    current.parent = None
+                    current = parent
                 path.append(current)
                 return path[::-1]
             openset.remove(current)
@@ -42,8 +45,8 @@ class AStar(object):
 
 class AStarNode(object):
     def __init__(self):
-        self.g = 0
-        self.h = 0
+        self.g = 0.0
+        self.h = 0.0
         self.parent = None
 
     def move_cost(self, other):
@@ -51,7 +54,7 @@ class AStarNode(object):
 
 class AStarGrid(AStar):
     def heuristic(self, node, start, end):
-        return sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
+        return 1.0*sqrt((end.x - node.x)**2 + (end.y - node.y)**2)
 
 
 class AStarGridNode(AStarNode):
@@ -61,8 +64,8 @@ class AStarGridNode(AStarNode):
         super(AStarGridNode, self).__init__()
 
     def move_cost(self, other):
-        diagonal = abs(self.x - other.x) == 1 and abs(self.y - other.y) == 1
-        return 140 if diagonal else 10 # fourteen comes from 1.414 = sqrt(2) for diagonals
+        diagonal = not (abs(self.x - other.x) <= 1 and abs(self.y - other.y) <= 1)
+        return 142 if diagonal else 10 # fourteen comes from 1.414 = sqrt(2) for diagonals it should never be diagonal
 
 class PathPlanner(object):
     
@@ -107,6 +110,11 @@ class PathPlanner(object):
 111110000000000000000000000000000000000000000000000000011111
 111110000000000000000000000000000000000000000000000000011111
 111110000000000000000000000000000000000000000000000000011111"""
+        self.obsticles=[]
+        self.height = 40
+        self.width = 60
+        self.graph, self.nodes = self.make_graph(self.width, self.height)
+        self.make_walls(self.gridString, self.graph, self.nodes, self.height, self.height)
         
     def make_graph(self,width, height):
         nodes = [[AStarGridNode(x, y) for y in range(height)] for x in range(width)]
@@ -172,58 +180,22 @@ class PathPlanner(object):
             if node.obst:
                 if (node1 is not node) or (node2 is not node):
                     dist = self.distance(node1,node2,node)
-                    if dist < 0.8:
+                    if dist < 0.707:
                         return True
         return False
-
-    def add_obsticle(self, coords, direction):
-        width = 1 #squares in both direction
-        length = 2 #squares in one direction
-        boxlist = product([0], [0])
-        if (direction<23) and (direction>=338):
-            boxlist=product([0,1], [-1,0,1])
-        elif (direction<68) and (direction>=23):
-            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,0),(0,1),(0,2),(1,1)]
-        elif (direction<103) and (direction>=68):
-            boxlist=product([-1,0,1],[0,1])
-        elif (direction<158) and (direction>=113):
-            boxlist=[(-1,1),(0,2),(0,1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
-        elif (direction<203) and (direction>=158):
-            boxlist=product([0,-1], [-1,0,1])
-        elif (direction<248) and (direction>=203):
-            boxlist=[(-1,-1),(0,-2),(0,-1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
-        elif (direction<293) and (direction>=248):
-            boxlist=product([-1,0,1],[0,-1])
-        elif (direction<338) and (direction>=293):
-            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,-2),(0,-1),(0,0),(1,-1)]
-        
-        for m, n in boxlist:
-            x = coords.x + m
-            y = coords.y + n
-            node=nodes[x][y]
-            node.obst=True
-            for i, j in product([-1, 0, 1], [-1, 0, 1]):
-                if not (0 <= x + i < width):
-                    continue
-                
-                if not (0 <= y + j < height):
-                    continue
-
-                if (nodes[x+i][y+j] in graph):
-                    if (node in graph[nodes[x+i][y+j]]):
-                        graph[nodes[x+i][y+j]].remove(node)
-
-        
 
     def generalise(self,graph, nodes, path):
         newpath=[] #list of generalised points
         count=0
-        newpath.append(path[count])
-        prevNode=path[count]
+        newpath.append(path[0])
+        prevNode=path[0]
         #print("Obstacles")
         for node in path:
-            if (node is not prevNode):
+            #print (str(node.x) + ", " + str(node.y))
+            if (node is not path[0]):
                 if self.obsticle_under_line(newpath[count],node,nodes):
+                    #print ("obs" + str(node.x) + ", " + str(node.y))
+                    #print ("append" + str(prevNode.x) + ", " + str(prevNode.y))
                     newpath.append(prevNode)
                     count+=1
                 prevNode=node
@@ -266,30 +238,33 @@ class PathPlanner(object):
             angle=360+angle
         elif (angle>180):
             angle=360-angle
-
         return angle
         
 
     # gets nodes in a format: start, end = (15,20), (45,20)
     def getPath(self,start, end, startdirection, enddirection):
-        graph, nodes = self.make_graph(60, 40)
-        self.make_walls(self.gridString, graph, nodes, 60, 40)
-        paths = AStarGrid(graph)
-        start, end = nodes[start[0]][start[1]], nodes[end[0]][end[1]]
+        paths = AStarGrid(self.graph)
+        start, end = self.nodes[start[0]][start[1]], self.nodes[end[0]][end[1]]
         path = paths.search(start, end)
         instructions=[]
         if path is None:
             instructions.append("NoPath")
         else:
-            newpath = self.generalise(graph, nodes, path)
+            newpath = self.generalise(self.graph, self.nodes, path)
             prevNode = newpath[0]
             prevBearing = startdirection
+            #print ("General")
             for node in newpath:
+                #print (str(node.x) + ", " + str(node.y))
                 if not node==newpath[0]:
                     newBearing = 360*self.bearing(prevNode,node)/(2*pi);
                     instruct = ("turn",round(self.calcAngle(prevBearing, newBearing),0))
                     instructions.append(instruct)
-                    instruct = ("drive",round(self.dist(prevNode,node)*5,0))
+                    dist=round(self.dist(prevNode,node)*5
+                    for (i in range(round(dist/100))):
+                        instruct = ("drive", 100,0))
+                        instructions.append(instruct)
+                    instruct = ("drive", dist%100,0)
                     instructions.append(instruct)
                     prevBearing = newBearing;
                 prevNode=node
@@ -297,3 +272,79 @@ class PathPlanner(object):
             instruct = ("turn",round(self.calcAngle(prevBearing, enddirection),0))
             instructions.append(instruct)
         return instructions
+
+    def add_obsticle(self, coords, direction):
+        print("add obsticle coords " + str(coords[0])+", "+ str(coords[1]) + ", " + str(direction) )
+        boxlist = product([0], [0])
+        if (direction<23) or (direction>=338):
+            #0
+            boxlist=product([-1,0,1],[0,-1])
+        elif (direction<68) and (direction>=23):
+            #45
+            boxlist=[(-1,-1),(0,-2),(0,-1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
+        elif (direction<103) and (direction>=68):
+            #90
+            boxlist=product([0,1], [-1,0,1])#([-1,0,1],[0,-1])
+        elif (direction<158) and (direction>=113):
+            #135
+            boxlist=[(-1,1),(0,2),(0,1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
+        elif (direction<203) and (direction>=158):
+            #180
+            boxlist=product([-1,0,1],[0,1])#boxlist=product([0,-1], [-1,0,1])
+        elif (direction<248) and (direction>=203):
+            #225
+            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,0),(0,1),(0,2),(1,1)]#[(-1,-1),(0,-2),(0,-1),(0,0),(1,-1),(1,0),(1,1),(2,0)]
+        elif (direction<293) and (direction>=248):
+            #270
+            boxlist=product([0,-1], [-1,0,1])
+        elif (direction<338) and (direction>=293):
+            #315
+            boxlist=[(-2,0),(-1,-1),(-1,0),(-1,1),(0,-2),(0,-1),(0,0),(1,-1)]
+
+        obsticle = []
+        for m, n in boxlist:
+            #print (str(m) + ", " + str(n))
+            x = coords[0] + m
+            y = coords[1] + n
+            #print(str(x) + ", " + str(y))
+            node=self.nodes[x][y]
+            node.obst=True
+            for i, j in product([-1, 0, 1], [-1, 0, 1]):
+                if not (0 <= x + i < self.width):
+                    continue
+                
+                if not (0 <= y + j < self.height):
+                    continue
+
+                if (self.nodes[x+i][y+j] in self.graph):
+                    if (node in self.graph[self.nodes[x+i][y+j]]):
+                        self.graph[self.nodes[x+i][y+j]].remove(node)
+                        if node not in obsticle:
+                            obsticle.append(node)
+
+
+        for node in obsticle:
+            print(str(node.x) + ", " + str(node.y))
+        self.obsticles.append(obsticle)
+
+    #deletes the last obsticle
+    def delete_obsticle(self):        
+        obsticle = self.obsticles[0]
+        
+        for node in obsticle:
+            node.obst=False
+            x=node.x
+            y=node.y
+            for i, j in product([-1, 0, 1], [-1, 0, 1]):
+                if not (0 <= x + i < self.width):
+                    continue
+                
+                if not (0 <= y + j < self.height):
+                    continue
+
+                if (self.nodes[x+i][y+j] in self.graph):
+                    if (node not in self.graph[self.nodes[x+i][y+j]]):
+                        self.graph[self.nodes[x+i][y+j]].append(node)
+                        #print(str(x+i) + ", " + str(y+j))
+    
+        del self.obsticles[0]
