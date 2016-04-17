@@ -261,7 +261,7 @@ class PathPlanner(object):
                     instruct = ("turn",round(self.calcAngle(prevBearing, newBearing),0))
                     instructions.append(instruct)
                     dist=round(self.dist(prevNode,node)*5
-                    for (i in range(round(dist/100))):
+                    for i in range(round(dist/100)):
                         instruct = ("drive", 100,0))
                         instructions.append(instruct)
                     instruct = ("drive", dist%100,0)
