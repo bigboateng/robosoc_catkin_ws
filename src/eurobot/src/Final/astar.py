@@ -262,7 +262,7 @@ class PathPlanner(object):
                     instructions.append(instruct)
                     dist=round(self.dist(prevNode,node)*5)
                     for i in range(round(dist/100)):
-                        instruct = ("drive", 100,0))
+                        instruct = ("drive", 100,0)
                         instructions.append(instruct)
                     instruct = ("drive", dist%100,0)
                     instructions.append(instruct)
