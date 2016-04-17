@@ -59,8 +59,9 @@ def onArduinoMessage(message):
     if msg == "a":        
         ## action complete, delete it and run next one
         rospy.loginfo("Arduino has replied")
-        """
+        
         global currentTaskActions, tasks
+        """
         if currentTaskActions[0][0] = "drive"
             if curDir < 90:
                 robotPos.y=robotPos.y-cos(curDir)*currentTaskActions[0][1]
