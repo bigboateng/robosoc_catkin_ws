@@ -168,7 +168,7 @@ def runMainLoop():
 
 def resetProgram():
     """This will reset the program"""
-    global currentTaskActions, tasks, shellCoords
+    global currentTaskActions, tasks, shellCoords, currentPos
     currentTaskActions = []
     tasks = []
     shellCoords = shellConfigArray[0]
