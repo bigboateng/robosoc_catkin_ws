@@ -84,7 +84,7 @@ def onArduinoMessage(message):
         runMainLoop()
     elif msg == "obstacleDetected":
         #parameters received back from the arduino are called: moved, and obstdist(obstical distance in cm) and obstpos(obsicle position: left/right/centre)
-        if currentTaskActions[0][0] == "drive"
+        if currentTaskActions[0][0] == "drive":
             if curDir < 90:
                 robotPos.y=robotPos.y-cos(curDir)*moved
                 robotPos.x=robotPos.x+sin(curDir)*moved
@@ -99,9 +99,9 @@ def onArduinoMessage(message):
                 robotPos.x=robotPos.x-sin(360-curDir)*moved
 
             
-            if obstpos = "right":
+            if obstpos == "right":
                 obstbearing = (curPos+20)%360 #20deg is just the range of the ir sensor
-            elif obstpos = "left":
+            elif obstpos == "left":
                 obstbearing = (curPos-20) #20deg is just the range of the ir sensor
                 if obstbearing<0:
                     obstbearing=360+obstbearing
