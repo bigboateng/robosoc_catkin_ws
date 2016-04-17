@@ -83,6 +83,7 @@ def onArduinoMessage(message):
         del currentTaskActions[0]
         runMainLoop()
     elif msg == "obstacleDetected":
+        """
         #parameters received back from the arduino are called: moved, and obstdist(obstical distance in cm) and obstpos(obsicle position: left/right/centre)
         if currentTaskActions[0][0] == "drive":
             if curDir < 90:
@@ -105,7 +106,7 @@ def onArduinoMessage(message):
                 obstbearing = (curPos-20) #20deg is just the range of the ir sensor
                 if obstbearing<0:
                     obstbearing=360+obstbearing
-            else
+            else:
                 obstbearing=curDir
 
             obstPos = (0,0)
@@ -126,7 +127,7 @@ def onArduinoMessage(message):
 
             #at this point the path needs to be recalculated
             currentTaskActions = tasks[0].generatePath(pathPlanner, robotPos)
-            
+            """
         
     elif msg == "start":
         resetProgram()
