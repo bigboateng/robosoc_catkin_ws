@@ -84,7 +84,7 @@ def onArduinoMessage(message):
         runMainLoop()
     elif msg == "obstacleDetected":
         #parameters received back from the arduino are called: moved, and obstdist(obstical distance in cm) and obstpos(obsicle position: left/right/centre)
-        if currentTaskActions[0][0] = "drive"
+        if currentTaskActions[0][0] == "drive"
             if curDir < 90:
                 robotPos.y=robotPos.y-cos(curDir)*moved
                 robotPos.x=robotPos.x+sin(curDir)*moved
