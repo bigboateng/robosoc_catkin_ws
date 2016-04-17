@@ -12,13 +12,13 @@ pathPlanner = PathPlanner()
 ##store the actions for current Task as list
 ##currentTaskActions = []
 ##fake current position TODO: remove this
-currentPos = (15,20)
+currentPos = (3,16)
 ##robot position variables
 robotPos = (3,16)
 curDir = 90 #bearing
 ##store time elapsed
 timeCount = Timer()
-timeLimit = 890.00
+timeLimit = 89.5
 ##store the coordinates of the stars
 shellCoords = []
 ##different configuration for shells
@@ -141,7 +141,7 @@ def onArduinoMessage(message):
     
 def runMainLoop():
     """TODO: insert proper comment"""
-    global currentTaskActions, tasks
+    global currentTaskActions, tasks, currentPos
     global timeCount, timeLimit
     if timeCount.get_time_secs() < timeLimit:
         if len(tasks) > 0:
@@ -155,7 +155,8 @@ def runMainLoop():
                 """get new actions if there are any actions left"""
                 del tasks[0]
                 if len(tasks) > 0:
-                    currentTaskActions = tasks[0].generatePath(pathPlanner, robotPos)
+                    currentTaskActions = tasks[0].generatePath(pathPlanner, currentPos)
+                    currentPos = tasks[0].get_coords()[-1]
 ##                  TODO: remove the line below
                     rospy.loginfo(tasks[0].generatePath(pathPlanner, robotPos))
                     runMainLoop()
@@ -170,10 +171,12 @@ def resetProgram():
     global currentTaskActions, tasks, shellCoords
     currentTaskActions = []
     tasks = []
+    shellCoords = shellConfigArray[0]
     ##    move blocks at start: Coors are now real
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
     tasks.append(moveBlocks)
-    currentTaskActions = moveBlocks.generatePath(pathPlanner, robotPos)
+    currentTaskActions = moveBlocks.generatePath(pathPlanner, currentPos)
+    currentPos = (24, 20)
     rospy.loginfo(moveBlocks.generatePath(pathPlanner, robotPos))
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])

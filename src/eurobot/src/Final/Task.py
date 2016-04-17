@@ -8,8 +8,8 @@ class Task:
         self.name = name
         self.actions = actions
         self.coordinates = coordinates
+        
 
-  
     def generatePath(self, planner, currentPos):
         """
         param currentPosition: tuple of currentPosition (x,y)
@@ -39,3 +39,6 @@ class Task:
 
     def get_name(self):
         return self.name
+
+    def get_coords(self):
+        return self.coordinates
