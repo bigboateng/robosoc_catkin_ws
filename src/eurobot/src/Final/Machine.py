@@ -64,17 +64,17 @@ def onArduinoMessage(message):
         """
         if currentTaskActions[0][0] = "drive"
             if curDir < 90:
-                robotPos[1]=robotPos[1]-cos(curDir)*currentTaskActions[0][1]
-                robotPos[0]=robotPos[0]+sin(curDir)*currentTaskActions[0][1]
+                robotPos.y=robotPos.y-cos(curDir)*currentTaskActions[0][1]
+                robotPos.x=robotPos.x+sin(curDir)*currentTaskActions[0][1]
             elif curDir <180:
-                robotPos[1]=robotPos[1]+cos(180-curDir)*currentTaskActions[0][1]
-                robotPos[0]=robotPos[0]+sin(180-curDir)*currentTaskActions[0][1]
+                robotPos.y=robotPos.y+cos(180-curDir)*currentTaskActions[0][1]
+                robotPos.x=robotPos.x+sin(180-curDir)*currentTaskActions[0][1]
             elif curDir <270:
-                robotPos[1]=robotPos[1]+cos(curDir-180)*currentTaskActions[0][1]
-                robotPos[0]=robotPos[0]-sin(curDir-180)*currentTaskActions[0][1]
+                robotPos.y=robotPos.y+cos(curDir-180)*currentTaskActions[0][1]
+                robotPos.x=robotPos.x-sin(curDir-180)*currentTaskActions[0][1]
             elif curDir <360:
-                robotPos[1]=robotPos[1]-cos(360-curDir)*currentTaskActions[0][1]
-                robotPos[0]=robotPos[0]-sin(360-curDir)*currentTaskActions[0][1]
+                robotPos.y=robotPos.y-cos(360-curDir)*currentTaskActions[0][1]
+                robotPos.x=robotPos.x-sin(360-curDir)*currentTaskActions[0][1]
                 
         if currentTaskActions[0][0] = "turn"
             curDir = (curDir + currentTaskActions[0][1])%360
@@ -88,19 +88,19 @@ def onArduinoMessage(message):
         #parameters received back from the arduino are called: moved, and obstdist(obstical distance in cm) and obstpos(obsicle position: left/right/centre)
         if currentTaskActions[0][0] == "drive":
             if curDir < 90:
-                robotPos[1]=robotPos[1]-cos(curDir)*moved
-                robotPos[0]=robotPos[0]+sin(curDir)*moved
+                robotPos.y=robotPos.y-cos(curDir)*moved
+                robotPos.x=robotPos.x+sin(curDir)*moved
             elif curDir <180:
-                robotPos[1]=robotPos[1]+cos(180-curDir)*moved
-                robotPos[0]=robotPos[0]+sin(180-curDir)*moved
+                robotPos.y=robotPos.y+cos(180-curDir)*moved
+                robotPos.x=robotPos.x+sin(180-curDir)*moved
             elif curDir <270:
-                robotPos[1]=robotPos[1]+cos(curDir-180)*moved
-                robotPos[0]=robotPos[0]-sin(curDir-180)*moved
+                robotPos.y=robotPos.y+cos(curDir-180)*moved
+                robotPos.x=robotPos.x-sin(curDir-180)*moved
             elif curDir <360:
-                robotPos[1]=robotPos[1]-cos(360-curDir)*moved
-                robotPos[0]=robotPos[0]-sin(360-curDir)*moved
+                robotPos.y=robotPos.y-cos(360-curDir)*moved
+                robotPos.x=robotPos.x-sin(360-curDir)*moved
 
-
+            
             if obstpos == "right":
                 obstbearing = (curPos+20)%360 #20deg is just the range of the ir sensor
             elif obstpos == "left":
@@ -112,17 +112,17 @@ def onArduinoMessage(message):
 
             obstPos = (0,0)
             if obstbearing < 90:
-                obstPos.y=robotPos[1]-cos(obstbearing)*obstdist
-                obstPos.x=robotPos[0]+sin(obstbearing)*obstdist
+                obstPos.y=robotPos.y-cos(obstbearing)*obstdist
+                obstPos.x=robotPos.x+sin(obstbearing)*obstdist
             elif obstbearing <180:
-                obstPos.y=robotPos[1]+cos(180-obstbearing)*obstdist
-                obstPos.x=robotPos[0]+sin(180-obstbearing)*obstdist
+                obstPos.y=robotPos.y+cos(180-obstbearing)*obstdist
+                obstPos.x=robotPos.x+sin(180-obstbearing)*obstdist
             elif obstbearing <270:
-                obstPos.y=robotPos[1]+cos(obstbearing-180)*obstdist
-                obstPos.x=robotPos[0]-sin(obstbearing-180)*obstdist
+                obstPos.y=robotPos.y+cos(obstbearing-180)*obstdist
+                obstPos.x=robotPos.x-sin(obstbearing-180)*obstdist
             elif obstbearing <360:
-                obstPos.y=robotPos[1]-cos(360-obstbearing)*obstdist
-                obstPos.x=robotPos[0]-sin(360-obstbearing)*obstdist
+                obstPos.y=robotPos.y-cos(360-obstbearing)*obstdist
+                obstPos.x=robotPos.x-sin(360-obstbearing)*obstdist
 
             pathPlanner.add_obsticle(obstPos, obstbearing)
 
@@ -171,13 +171,14 @@ def resetProgram():
     global currentTaskActions, tasks, shellCoords, currentPos
     currentTaskActions = []
     tasks = []
+    fakeActions = []
     #shellCoords = shellConfigArray[0]
     ##    move blocks at start: Coors are now real
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
     tasks.append(moveBlocks)
     currentTaskActions = moveBlocks.generatePath(pathPlanner, currentPos)
     currentPos = (24, 20)
-    rospy.loginfo(moveBlocks.generatePath(pathPlanner, robotPos))
+    rospy.loginfo(currentTaskActions)
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
     #tasks.append(closeDoor)
