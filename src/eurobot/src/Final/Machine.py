@@ -147,7 +147,7 @@ def runMainLoop():
         if len(tasks) > 0:
             if len(currentTaskActions) > 0:
                 """ perform the actions actions"""
-                rospy.loginfo("{} actions left\t Current job: {} \ttime elapsed: {}".format(len(currentTaskActions),tasks[0].get_name(), timeCount.get_time_secs()))
+ #              rospy.loginfo("{} actions left\t Current job: {} \ttime elapsed: {}".format(len(currentTaskActions),tasks[0].get_name(), timeCount.get_time_secs()))
                 rospy.loginfo("Sending  {}, {}".format(currentTaskActions[0][0],currentTaskActions[0][1]))
                 actionNamePublisher.publish(currentTaskActions[0][0])
                 actionValuePublisher.publish(currentTaskActions[0][1])
