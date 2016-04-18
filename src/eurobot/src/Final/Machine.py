@@ -170,14 +170,15 @@ def resetProgram():
     """This will reset the program"""
     global currentTaskActions, tasks, shellCoords, currentPos
     currentTaskActions = []
-    tasks = []
-    fakeActions = []
+    tasks = ['t']
+    fakeActions = [('drive', 50), ('turn', 90), ('drive', 50), ('turn', 90), ('drive', 50), ('turn', 90), ('drive', 50), ('turn', 90)]
     #shellCoords = shellConfigArray[0]
     ##    move blocks at start: Coors are now real
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
-    tasks.append(moveBlocks)
-    currentTaskActions = moveBlocks.generatePath(pathPlanner, currentPos)
+    #tasks.append(moveBlocks)
+    #currentTaskActions = moveBlocks.generatePath(pathPlanner, currentPos)
     currentPos = (24, 20)
+    currentTaskActions = fakeActions
     rospy.loginfo(currentTaskActions)
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
