@@ -171,7 +171,7 @@ def resetProgram():
     global currentTaskActions, tasks, shellCoords, currentPos
     currentTaskActions = []
     tasks = []
-    shellCoords = shellConfigArray[0]
+    #shellCoords = shellConfigArray[0]
     ##    move blocks at start: Coors are now real
     moveBlocks = Task('move starting blocks', [(12,17),(24,20)], [1,1])
     tasks.append(moveBlocks)
@@ -180,7 +180,7 @@ def resetProgram():
     rospy.loginfo(moveBlocks.generatePath(pathPlanner, robotPos))
 ##    close doors command 
     closeDoor = Task('close doors',[(45,20), (33,33)],[1, 2])
-    tasks.append(closeDoor)
+    #tasks.append(closeDoor)
 ##   adding shells  
     for coord in shellCoords:
         shellTask = Task('pick up shell {}'.format(shellCoords.index(coord)),[coord],[4])
@@ -202,5 +202,4 @@ if __name__  == "__main__":
     """This will reset the program"""
     currentTaskActions = []
     tasks = []
-    rospy.loginfo("Waiting for start command")
     rospy.spin()

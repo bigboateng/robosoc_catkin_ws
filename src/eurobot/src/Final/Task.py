@@ -20,10 +20,8 @@ class Task:
         actions = self.actions
         coordinates = self.coordinates
         lastPosition = (None, None)
-        for i in range(len(self.actions)):
+        for i in range(len(self.coordinates)):
             """Tipically it would be """
-##            planner = PathPlanner()
-##            path = planer.getPath(currentPos,coordinates[i],10,12)
             if i == 0:
 ##                print("Starting at {}".format(currentPos))
                 paths.extend(planner.getPath(currentPos, coordinates[i],0,0))
