@@ -189,9 +189,11 @@ def resetProgram():
         tasks.append(shellTask)
     rospy.loginfo("******************************")
     rospy.loginfo("TASK ID \t NAME")
+    """
     for t in tasks:
         rospy.loginfo(str(tasks.index(t)) + "\t" + t.get_name())
     rospy.loginfo("****Listening for START command from arduino****")
+    """
 
 rospy.init_node('pythonNode',anonymous=True)
 actionNamePublisher = rospy.Publisher('actionName', String, queue_size=10)
